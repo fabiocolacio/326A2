@@ -16,7 +16,7 @@ main (int   argc,
       char *argv)
 {
     key_t  key = ftok ("/home", MARKER);
-    int    msgflag = IPC_CREAT |  0666;
+    int    msgflag = 0666;
     int    id = msgget (key, msgflag);
 
     if (id == -1) {
@@ -33,17 +33,24 @@ main (int   argc,
         // Send a random message
         msg.type = MARKER;
         msg.data = rand () * MARKER;
+
         msgsnd (id, &msg, EVENT_SIZE, 0);
+        msgrcv (id, &msg, EVENT_SIZE, 1, 0);
+        printf ("Sender 1 ACK: %d\n", msg.data);
+        if (msg.data < 100) {
+            break;
+        }
 
-        // Wait for first response
-        err = msgrcv (id, &msg, EVENT_SIZE, MARKER, 0);
-        if (err) printf ("%d\n", errno);
-        if (msg.data < 100) break;
+        /*
 
-        // Wait for second response
-        err = msgrcv (id, &msg, EVENT_SIZE, MARKER, 0);
-        if (err) printf ("%d\n", errno);
-        if (msg.data < 100) break;
+        msgsnd (id, &msg, EVENT_SIZE, 0);
+        msgrcv (id, &msg, EVENT_SIZE, 2, 0);
+        printf ("Sender 2 ACK: %d\n", msg.data);
+        if (msg.data < 100) {
+            break;
+        }
+
+        */
     }
 
     return 0;
