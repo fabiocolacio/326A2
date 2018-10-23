@@ -16,7 +16,7 @@ main (int   argc,
     key_t key = ftok ("/home", 1);
     int   id = msgget (key, msgflag);
 
-    int   dead_senders = 0;
+    int   total_messages = 0;
 
     if (id == -1) {
         return -1;
@@ -24,22 +24,21 @@ main (int   argc,
 
     srand (time (0));
 
-    while (dead_senders < 2) {
+    while (total_messages < 5000) {
         event msg;
 
-        msgrcv (id, &msg, EVENT_SIZE, 1, 0);
+        msgrcv (id, &msg, EVENT_SIZE, 2, 0);
 
         if (msg.data % 997 == 0) {
             printf ("Sender 997: %d\n", msg.data);
+            total_messages += 1;
             msg.type = 997;
             msg.data = rand ();
             msgsnd (id, &msg, EVENT_SIZE, 0);
         }
-        else if (msg.data % 251 == 0) {
-            printf ("Sender 251: %d\n", msg.data);
-        }
-        else if (msg.data == -997 || msg.data == -251) {
-            dead_senders += 1;
+        else if (msg.data % 257 == 0) {
+            printf ("Sender 257: %d\n", msg.data);
+            total_messages += 1;
         }
     }
 
