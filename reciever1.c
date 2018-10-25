@@ -25,7 +25,7 @@ main (int   argc,
 
     srand (time (0));
 
-    while (dead_senders < 2) {
+    while (dead_programs <= 4 && dead_senders < 2) {
         event msg;
 
         msgrcv (id, &msg, EVENT_SIZE, 1, 0);
