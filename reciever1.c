@@ -25,25 +25,25 @@ main (int   argc,
 
     srand (time (0));
 
-    while (dead_programs <= 4 && dead_senders < 2) {
+    while (dead_programs < 4 && dead_senders < 2) {
         event msg;
 
         msgrcv (id, &msg, EVENT_SIZE, 1, 0);
 
-        if (msg.data % 997 == 0) {
+        if (msg.sender == 997) {
             printf ("Sender 997: %d\n", msg.data);
             msg.type = 997;
-            msg.data = rand ();
+            msg.data = (2 * rand ()) + 1;
             msgsnd (id, &msg, EVENT_SIZE, 0);
         }
-        else if (msg.data % 251 == 0) {
+        else if (msg.sender == 251) {
             printf ("Sender 251: %d\n", msg.data);
         }
-        else if (msg.data == -997 || msg.data == -251) {
+        else if (msg.sender == -997 || msg.sender == -251) {
             dead_senders += 1;
             dead_programs += 1;
         }
-        else if (msg.data == -2 || msg.data == -257) {
+        else if (msg.sender == -2 || msg.sender == -257) {
             dead_programs += 1; 
         }
     }
