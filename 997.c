@@ -15,44 +15,54 @@ int
 main (int   argc,
       char *argv)
 {
-    key_t  key = ftok ("/home", MARKER);
-    int    msgflag = 0666;
-    int    id = msgget (key, msgflag);
+    int   msgflag = IPC_CREAT | 0666;
+
+    key_t key = ftok ("/home", 1);
+    int   id = msgget (key, msgflag);
 
     if (id == -1) {
         return 1;
     }
 
     event  msg;
+    event msg2;
 
     srand (time (0));
+
 
     while (1) {
         ssize_t err = 0;
 
-        // Send a random message
-        msg.type = MARKER;
+        // Send a random message to two senders
+        msg.type = 1;
         msg.data = rand () * MARKER;
-
+	msg.sender = MARKER;
         msgsnd (id, &msg, EVENT_SIZE, 0);
-        msgrcv (id, &msg, EVENT_SIZE, 1, 0);
-        printf ("Sender 1 ACK: %d\n", msg.data);
-        if (msg.data < 100) {
-            break;
-        }
 
-        /*
+	msg2.type = 2;
+	msg2.data = rand () * MARKER;
+	msg2.sender = MARKER;
+	msgsnd (id, &msg2, EVENT_SIZE, 0);
 
-        msgsnd (id, &msg, EVENT_SIZE, 0);
-        msgrcv (id, &msg, EVENT_SIZE, 2, 0);
-        printf ("Sender 2 ACK: %d\n", msg.data);
-        if (msg.data < 100) {
-            break;
-        }
+	// receive acknowledgement message
+	msgrcv (id, &msg, EVENT_SIZE, 997, 0);
 
-        */
+	if (msg.sender == 1)
+	    printf ("Sender 1 ACK: %d\n", msg.data);
+	else if (msg.sender == 2)
+	    printf ("Sender 2 ACK: %d\n", msg.data);
+
+	if (msg.data < 100)
+	    break;
+
     }
+ 
+    event endmsg;
+
+    endmsg.type = 1;
+    endmsg.data = -997;
+
+    msgsnd (id, &endmsg, EVENT_SIZE, 0); 
 
     return 0;
 }
-
