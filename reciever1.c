@@ -34,6 +34,7 @@ main (int   argc,
             printf ("Sender 997: %d\n", msg.data);
             msg.type = 997;
             msg.data = (2 * rand ()) + 1;
+	    msg.sender = 1;
             msgsnd (id, &msg, EVENT_SIZE, 0);
         }
         else if (msg.sender == 251) {

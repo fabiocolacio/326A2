@@ -36,6 +36,7 @@ main (int   argc,
             total_messages += 1;
             msg.type = 997;
             msg.data = 2 * rand ();
+	    msg.sender = 2;
             msgsnd (id, &msg, EVENT_SIZE, 0);
         }
         else if (msg.sender == 257) {
