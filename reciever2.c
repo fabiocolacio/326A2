@@ -12,13 +12,11 @@ main (int   argc,
       char *argv)
 {
     int   msgflag = IPC_CREAT | 0666;
-
     key_t key = ftok ("/home", 1);
     int   id = msgget (key, msgflag);
-
     int   total_messages = 0;
-
     int   dead_programs = 0;
+    event msg;
 
     if (id == -1) {
         return -1;
@@ -27,16 +25,15 @@ main (int   argc,
     srand (time (0));
 
     while (dead_programs < 4 && total_messages < 5000) {
-        event msg;
-
         msgrcv (id, &msg, EVENT_SIZE, 2, 0);
 
         if (msg.sender == 997) {
             printf ("Sender 997: %d\n", msg.data);
             total_messages += 1;
+
             msg.type = 997;
             msg.data = 2 * rand ();
-	    msg.sender = 2;
+            msg.sender = 2;
             msgsnd (id, &msg, EVENT_SIZE, 0);
         }
         else if (msg.sender == 257) {
@@ -53,6 +50,21 @@ main (int   argc,
 
     if (dead_programs >= 4) {
         msgctl (id, IPC_RMID, NULL);
+    }
+    else {
+        msg.sender = -2;
+
+        msg.type = 1;
+        msgsnd (id, &msg, EVENT_SIZE, 0);
+
+        msg.type = 257;
+        msgsnd (id, &msg, EVENT_SIZE, 0);
+
+        msg.type = 251;
+        msgsnd (id, &msg, EVENT_SIZE, 0);
+
+        msg.type = 997;
+        msgsnd (id, &msg, EVENT_SIZE, 0);
     }
 
     return 0;

@@ -15,54 +15,61 @@ int
 main (int   argc,
       char *argv)
 {
-    int   msgflag = IPC_CREAT | 0666;
-
+    int msgflag = IPC_CREAT | 0666;
     key_t key = ftok ("/home", 1);
-    int   id = msgget (key, msgflag);
+    int id = msgget (key, msgflag);
+    event msg;
+    int dead_programs = 0;
 
     if (id == -1) {
         return 1;
     }
 
-    event  msg;
-    event msg2;
-
     srand (time (0));
 
-
-    while (1) {
+    while (dead_programs < 4) {
         ssize_t err = 0;
 
         // Send a random message to two senders
         msg.type = 1;
         msg.data = rand () * MARKER;
-	msg.sender = MARKER;
+        msg.sender = MARKER;
+        msgsnd (id, &msg, EVENT_SIZE, 0);
+        msg.type = 2;
+        msg.data = rand () * MARKER;
+        msg.sender = MARKER;
         msgsnd (id, &msg, EVENT_SIZE, 0);
 
-	msg2.type = 2;
-	msg2.data = rand () * MARKER;
-	msg2.sender = MARKER;
-	msgsnd (id, &msg2, EVENT_SIZE, 0);
+        // receive acknowledgement message
+        msgrcv (id, &msg, EVENT_SIZE, 997, 0);
 
-	// receive acknowledgement message
-	msgrcv (id, &msg, EVENT_SIZE, 997, 0);
+        if (msg.sender == 1 || msg.sender == 2)
+            printf ("Receiver %d ACK: %d\n", msg.sender, msg.data);
+        else if (msg.sender < 1)
+            dead_programs += 1;
 
-	if (msg.sender == 1)
-	    printf ("Sender 1 ACK: %d\n", msg.data);
-	else if (msg.sender == 2)
-	    printf ("Sender 2 ACK: %d\n", msg.data);
-
-	if (msg.data < 100)
-	    break;
-
+        if (msg.data < 100)
+            break;
     }
- 
-    event endmsg;
 
-    endmsg.type = 1;
-    endmsg.data = -997;
+    if (dead_programs >= 4) {
+        msgctl (id, IPC_RMID, NULL);
+    }
+    else {
+        msg.sender = -MARKER;
 
-    msgsnd (id, &endmsg, EVENT_SIZE, 0); 
+        msg.type = 1;
+        msgsnd (id, &msg, EVENT_SIZE, 0);
+
+        msg.type = 2;
+        msgsnd (id, &msg, EVENT_SIZE, 0);
+
+        msg.type = 257;
+        msgsnd (id, &msg, EVENT_SIZE, 0);
+
+        msg.type = 251;
+        msgsnd (id, &msg, EVENT_SIZE, 0);
+    }
 
     return 0;
 }

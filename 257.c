@@ -15,16 +15,15 @@ int
 main (int   argc,
       char *argv[])
 {
-    int   msgflag = IPC_CREAT | 0666;
-
+    int msgflag = IPC_CREAT | 0666;
     key_t key = ftok ("/home", 1);
-    int   id = msgget (key, msgflag);
+    int id = msgget (key, msgflag);
+    int dead_programs = 0;
+    event msg;
 
     if (id == -1) {
         return 1;
     }
-
-    event msg;
 
     srand (time (0));
 
@@ -33,20 +32,38 @@ main (int   argc,
 
         msg.type = 2;
         msg.data = rand () * MARKER;
-	msg.sender = MARKER;
+        msg.sender = MARKER;
         msgsnd (id, &msg, EVENT_SIZE, 0);
 
-	msgrcv (id, &msg, EVENT_SIZE, 2, 0);
-	if (msg.data == -2)
-	    break;
+        msg.type = MARKER;
+        msg.sender = 2;
+        msgsnd (id, &msg, EVENT_SIZE, 0);
+
+        msgrcv (id, &msg, EVENT_SIZE, MARKER, 0);
+        if (msg.sender < 0)
+            dead_programs += 1;
+        if (msg.sender == -2)
+            break;
     }
 
-    event endmsg;
+    if (dead_programs >= 4) {
+        msgctl (id, IPC_RMID, NULL);
+    }
+    else {
+        msg.sender = -MARKER;
 
-    endmsg.type = 1;
-    endmsg.data = -251;
+        msg.type = 1;
+        msgsnd (id, &msg, EVENT_SIZE, 0); 
 
-    msgsnd (id, &endmsg, EVENT_SIZE, 0); 
+        msg.type = 2;
+        msgsnd (id, &msg, EVENT_SIZE, 0); 
+
+        msg.type = 251;
+        msgsnd (id, &msg, EVENT_SIZE, 0); 
+
+        msg.type = 997;
+        msgsnd (id, &msg, EVENT_SIZE, 0); 
+    }
 
     return 0;
 }
