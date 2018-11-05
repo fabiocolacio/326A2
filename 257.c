@@ -5,6 +5,7 @@
 #include <string.h>
 #include <time.h>
 #include <stdio.h>
+#include <unistd.h>
 
 #include "event.h"
 
@@ -34,9 +35,11 @@ main (int   argc,
         msg.type = MARKER;
         msg.sender = 2;
         msgsnd (id, &msg, EVENT_SIZE, 0);
-
+        
         msgrcv (id, &msg, EVENT_SIZE, MARKER, 0);
         if (msg.sender == -2) break;
+
+        usleep (5000);
     }
 
     return 0;

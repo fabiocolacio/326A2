@@ -34,7 +34,7 @@ main (int   argc,
             msg.sender = 1;
             msgsnd (id, &msg, EVENT_SIZE, 0);
         }
-        else if (msg.sender < 0) {
+        else if (msg.sender <= 0) {
             dead_senders += 1;
         }
     }

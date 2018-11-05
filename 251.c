@@ -5,6 +5,7 @@
 #include <string.h>
 #include <time.h>
 #include <stdio.h>
+#include <unistd.h>
 
 #include "get_info.h"
 #include "event.h"
@@ -32,6 +33,8 @@ main (int   argc,
         msg.data = rand () * MARKER;
         msg.sender = MARKER;
         msgsnd (id, &msg, EVENT_SIZE, 0);
+
+        usleep (5000);
     }
 
     return 0;
