@@ -14,7 +14,7 @@ int
 main (int   argc,
       char *argv)
 {
-    int msgflag = IPC_CREAT | IPC_EXCL | 0666;
+    int msgflag = IPC_CREAT | 0666;
     key_t key = ftok ("/home", 1);
     int id = msgget (key, msgflag);
     if (id == -1) return 1;
