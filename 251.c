@@ -29,7 +29,7 @@ main (int   argc,
 
     while (1) {
         msg.type = 1;
-        msg.data = rand ();
+        msg.data = rand () * MARKER;
         msg.sender = MARKER;
         msgsnd (id, &msg, EVENT_SIZE, 0);
     }

@@ -31,7 +31,7 @@ main (int   argc,
 
         if (msg.sender == 997) {
             msg.type = 997;
-            msg.data = rand ();
+            msg.data = rand () * MARKER;
             msg.sender = MARKER;
             msgsnd (id, &msg, EVENT_SIZE, 0);
         }

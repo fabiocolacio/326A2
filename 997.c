@@ -30,7 +30,7 @@ main (int   argc,
         msgsnd (id, &msg, EVENT_SIZE, 0);
 
         msg.type = 2;
-        msg.data = rand ();
+        msg.data = rand () * MARKER;
         msg.sender = MARKER;
         msgsnd (id, &msg, EVENT_SIZE, 0);
 
