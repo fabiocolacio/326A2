@@ -1,3 +1,22 @@
+/*
+ * Fabio Colacio and Mariel Trajano
+ *
+ * Associated Files
+ * ----------------
+ * event.h
+ * receiver1.c
+ * receiver2.c
+ * 251.c
+ * 257.c
+ * 997.c
+ *
+ * Description
+ * -----------
+ * Sender 251 sends messages to receiver1.
+ * When sender 251 receives a kill signal, it notifies
+ * receiver1 that it is about to terminate before doing so.
+ */
+
 #include <sys/types.h>
 #include <sys/ipc.h>
 #include <sys/msg.h>
@@ -34,6 +53,10 @@ main (int   argc,
         msg.sender = MARKER;
         msgsnd (id, &msg, EVENT_SIZE, 0);
 
+        // This delay is not for synchronization.
+        // It is here to prevent the message queue from
+        // being flooded with messages faster than they can be processed,
+        // which causes the queue to reach the max amount of messages.
         usleep (5000);
     }
 

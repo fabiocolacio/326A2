@@ -1,3 +1,24 @@
+/*
+ * Fabio Colacio and Mariel Trajano
+ *
+ * Associated Files
+ * ----------------
+ * event.h
+ * receiver1.c
+ * receiver2.c
+ * 251.c
+ * 257.c
+ * 997.c
+ *
+ * Description
+ * -----------
+ * receiver2 listens to messages from senders 997 and 257.
+ * receiver2 terminates when it has received a total of 5000 messages.
+ * When receiver2 receives a message from 997, it sends a randomized message back to 997.
+ * Before terminating, receiver2 sends a notification to 257 that it will terminate, by
+ * sending a message with a sender value of -2.
+ */
+
 #include <sys/types.h>
 #include <sys/ipc.h>
 #include <sys/msg.h>
